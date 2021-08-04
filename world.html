@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        * {
+             margin: 0;
+            padding: 0;
+       }
+
+        div {
+             border: 1px ;
+        }
+       /*整个容器*/
+         #main {
+             position: relative;
+            height: 1000px;
+         }
+         /*头部*/
+        #head {
+            position: absolute;
+            height: 5%;
+            width: 100%;
+            background: #1b1e21;
+       }
+        #daolang {
+            position: absolute;
+          height: 90%;
+            width:100%;
+            top:7%;
+
+       }
+
+        .myway li{
+            margin-bottom:30px;
+        }
+
+				ul{
+				background-color: #081832;
+				list-style-type: none;
+				overflow: hidden;
+			}
+
+			li{
+				/*display与float两种方式使列表转为横向*/
+				/* display: inline; */
+				float: left;
+
+			}
+
+			li a{
+				display:block ;
+				color: #FFFFFF;
+				text-decoration: none;
+				text-align: center;
+				padding: 20px 40px;
+			}
+    li a:hover{
+				background-color:#000000 ;
+				color: #999999;
+			}
+.active{
+				background-color: #555;
+			}
+
+
+    </style>
+</head>
+<body>
+<div id="main">
+         <div id="head">
+             <ul>
+			<li ><a href={% url 'index' %}>今日疫情</a></li>
+			<li><a href={% url 'history' %}>历史疫情</a></li>
+			<li><a href={% url 'move' %}>湖北迁徙</a></li>
+			<li><a href={% url 'wordcloud' %}>百度词云</a></li>
+			<li><a href={% url 'line' %}>疫情趋势</a></li>
+            <li><a href={% url 'ranking' %}>疫情TOP5</a></li>
+            <li><a href={% url 'world' %}>世界疫情</a></li>
+
+		</ul>
+         </div>
+        <div id="daolang">
+            <iframe src="/static/world-cov.html" frameBorder="0" width="100%" scrolling="no" height="100%"></iframe>
+        </div>
+    </div>
+
+</body>
+</html>

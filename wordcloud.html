@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>百度词云</title>
+    <style>
+        * {
+             margin: 0;
+            padding: 0;
+       }
+
+        div {
+             border: 1px ;
+        }
+       /*整个容器*/
+         #main {
+             position: relative;
+            height: 1000px;
+         }
+         /*头部*/
+        #head {
+            position: absolute;
+            height: 5%;
+            width: 100%;
+            background: #1b1e21;
+       }
+        #word {
+            position: absolute;
+          height: 95%;
+            width:100%;
+            top:5%;
+
+       }
+
+        .myway li{
+            margin-bottom:30px;
+        }
+
+				ul{
+				background-color: #081832;
+				list-style-type: none;
+				overflow: hidden;
+			}
+
+			li{
+				/*display与float两种方式使列表转为横向*/
+				/* display: inline; */
+				float: left;
+
+			}
+
+			li a{
+				display:block ;
+				color: #FFFFFF;
+				text-decoration: none;
+				text-align: center;
+				padding: 20px 40px;
+			}
+    li a:hover{
+				background-color:#000000 ;
+				color: #999999;
+			}
+.active{
+				background-color: #555;
+			}
+
+
+    </style>
+</head>
+<body>
+<div id="main">
+         <div id="head">
+             <ul>
+			<li ><a href={% url 'index' %}>今日疫情</a></li>
+			<li><a href={% url 'history' %}>历史疫情</a></li>
+			<li><a href={% url 'move' %}>湖北迁徙</a></li>
+			<li><a href={% url 'wordcloud' %}>百度词云</a></li>
+			<li><a href={% url 'line' %}>疫情趋势</a></li>
+             <li><a href={% url 'ranking' %}>疫情TOP5</a></li>
+            <li><a href={% url 'world' %}>世界疫情</a></li>
+
+		</ul>
+         </div>
+        <div id="word"></div>
+    </div>
+<script type="text/javascript" src="/static/echarts-5.1.2/test/lib/jquery.min.js"></script>
+<script type="text/javascript" src="/static/echarts.min.js"></script>
+<script type="text/javascript" src="/static/echarts.js"></script>
+<script type="text/javascript" src="/static/echarts-5.1.2/test/data/map/js/china.js"></script>
+<!-- <script src="./node_modules/_echarts@4.6.0@echarts/map/js/province/guangdong.js"></script> -->
+<script type="text/javascript" src="/static/echarts-5.1.2/test/data/map/js/province/"></script>
+<script type="text/javascript" src="/static/echarts-5.1.2/theme/dark.js"></script>
+<script type="text/javascript" src="/static/echarts-wordcloud.min.js"></script>
+<script type="text/javascript">
+window.onload = function () {
+    word();
+function word() {
+        var myChart = echarts.init(document.getElementById('word'),"dark");
+        var context ={{ context|safe }}
+        var option = {
+            title: {
+                text: '百度热搜词云',
+                x: "center"
+            },
+
+            series: [
+                {
+                    type: "wordCloud",
+                    //用来调整词之间的距离
+                    gridSize: 5,
+                    //用来调整字的大小范围
+                    // Text size range which the value in data will be mapped to.
+                    // Default to have minimum 12px and maximum 60px size.
+                    sizeRange: [14, 50],
+                    // Text rotation range and step in degree. Text will be rotated randomly in range [-90,                                                                             90] by rotationStep 45
+                    //用来调整词的旋转方向，，[0,0]--代表着没有角度，也就是词为水平方向，需要设置角度参考注释内容
+                    rotationRange: [-0, 0, 0, 0],
+
+                    //随机生成字体颜色
+                    textStyle: {
+            fontFamily: 'sans-serif',
+            fontWeight: 'bold',
+            // Color can be a callback function or a color string
+            color: function () {
+                // Random color
+                return 'rgb(' + [
+                    Math.round(Math.random() * 160),
+                    Math.round(Math.random() * 160),
+                    Math.round(Math.random() * 160)
+                ].join(',') + ')';
+            }
+        },
+                    emphasis: {
+            focus: 'self',
+
+            textStyle: {
+                shadowBlur: 10,
+                shadowColor: '#333'
+            }
+        },
+                    //位置相关设置
+                    left: "center",
+                    top: "center",
+                    right: null,
+                    bottom: null,
+                    width: "80%",
+                    height: "80%",
+                    //数据
+                    data: context,
+                }
+            ]
+        };
+        myChart.setOption(option);
+        // 点击某个字
+        myChart.on('click', function (params) {
+            console.log('myChart----click---:', params, '------', params.data)
+        });
+
+            }
+     }
+
+        </script>
+</body>
+</html>
