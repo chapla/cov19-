@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>中国疫情数据可视化</title>
+    <style>
+        * {
+             margin: 0;
+            padding: 0;
+       }
+
+        div {
+             border: 1px ;
+        }
+       /*整个容器*/
+         #main {
+             position: relative;
+            height: 1000px;
+         }
+         /*头部*/
+        #head {
+            position: absolute;
+            height: 5%;
+            width: 100%;
+            background: #EEF4FF;
+       }
+
+        #confirm {
+            position: absolute;
+            height: 47.5%;
+            width:50%;
+            top:5%;
+
+       }
+        #heal {
+            position: absolute;
+            height: 47.5%;
+            width:50%;
+            left: 50%;
+            top:5%;
+
+       }
+        #dead {
+            position: absolute;
+            height: 47.5%;
+            width:50%;
+            top:52.5%;
+
+       }
+        #today_con {
+            position: absolute;
+            height: 47.5%;
+            width:50%;
+            left: 50%;
+            top:52.5%;
+
+       }
+        .myway li{
+            margin-bottom:30px;
+        }
+        ul{
+				background-color: #081832;
+				list-style-type: none;
+				overflow: hidden;
+			}
+
+			li{
+				/*display与float两种方式使列表转为横向*/
+				/* display: inline; */
+				float: left;
+
+			}
+
+			li a{
+				display:block ;
+				color: #FFFFFF;
+				text-decoration: none;
+				text-align: center;
+				padding: 20px 40px;
+			}
+    li a:hover{
+				background-color:#000000 ;
+				color: #999999;
+			}
+.active{
+				background-color: #555;
+			}
+
+    </style>
+</head>
+<body>
+<div id="main">
+    <div id="head">
+             <ul >
+			<li ><a href={% url 'index' %}>今日疫情</a></li>
+			<li><a href={% url 'history' %}>历史疫情</a></li>
+			<li><a href={% url 'move' %}>湖北迁徙</a></li>
+			<li><a href={% url 'wordcloud' %}>百度词云</a></li>
+			<li><a href={% url 'line' %}>疫情趋势</a></li>
+            <li><a href={% url 'ranking' %}>疫情TOP5</a></li>
+            <li><a href={% url 'world' %}>世界疫情</a></li>
+		</ul>
+         </div>
+    <div id="confirm"></div>
+    <div id="heal"></div>
+    <div id="dead"></div>
+    <div id="today_con"></div>
+
+    </div>
+<script type="text/javascript" src="/static/echarts-5.1.2/test/lib/jquery.min.js"></script>
+<script type="text/javascript" src="/static/echarts.min.js"></script>
+<script type="text/javascript" src="/static/echarts.js"></script>
+<script type="text/javascript" src="/static/echarts-5.1.2/test/data/map/js/china.js"></script>
+<!-- <script src="./node_modules/_echarts@4.6.0@echarts/map/js/province/guangdong.js"></script> -->
+<script type="text/javascript" src="/static/echarts-5.1.2/test/data/map/js/province/"></script>
+<script type="text/javascript" src="/static/echarts-5.1.2/theme/dark.js"></script>
+<script type="text/javascript" src="/static/echarts-wordcloud.min.js"></script>
+
+<script type="text/javascript">
+    //页面完全载入后(包括图片、css文件等等)执行脚本代码
+    //因为 JavaScript 中的函数方法需要在 HTML 文档渲染完成后才可以使用，如果没有渲染完成，此时的 DOM 树是不完整的，这样在调用一些 JavaScript 代码时就可能报出"undefined"错误。
+window.onload = function () {
+        confirm();
+        heal();
+        dead();
+        today_con();
+     function confirm() {
+
+         var confirm={{ confirm|safe }}
+         var name={{ name|safe }}
+         var myChart = echarts.init(document.getElementById('confirm'), 'dark');
+           option = {
+
+    title : {
+        text: '累计确诊城市TOP5',
+
+    },
+
+    tooltip : {
+
+        trigger: 'axis'
+
+    },
+
+    legend: {
+
+        data:['累计确诊']
+
+    },
+
+    toolbox: {
+
+        show : false,
+
+        feature : {
+
+            mark : {show: true},
+
+            dataView : {show: true, readOnly: false},
+
+            magicType : {show: true, type: ['line', 'bar']},
+
+            restore : {show: true},
+
+            saveAsImage : {show: true}
+
+        }
+
+    },
+
+    calculable : true,
+
+    xAxis : [
+
+        {
+
+            type : 'category',
+
+            data : name
+
+        }
+
+    ],
+
+    yAxis : [
+
+        {
+
+            type : 'value'
+
+        }
+
+    ],
+
+    series : [
+
+        {
+
+            name:'累计确诊',
+
+            type:'bar',
+
+            data:confirm,
+
+            markPoint : {
+
+                data : [
+
+                    {type : 'max', name: '最大值'},
+
+                    {type : 'min', name: '最小值'}
+
+                ]
+
+            },
+
+            markLine : {
+
+                data : [
+
+                    {type : 'average', name: '平均值'}
+
+                ]
+
+            }
+
+        },
+
+        ]
+
+};
+    // 使用刚指定的配置项和数据显示图表。
+    myChart.setOption(option);
+     }
+     function heal() {
+
+         var name_heal={{ name_heal|safe }}
+         var heal={{ heal|safe }}
+         var myChart = echarts.init(document.getElementById('heal'), 'dark');
+           option = {
+
+    title : {
+        text: '累计治愈城市TOP5',
+    },
+    tooltip : {
+        trigger: 'axis'
+    },
+    legend: {
+
+        data:['累计治愈']
+    },
+    toolbox: {
+        show : false,
+        feature : {
+            mark : {show: true},
+            dataView : {show: true, readOnly: false},
+            magicType : {show: true, type: ['line', 'bar']},
+            restore : {show: true},
+            saveAsImage : {show: true}
+        }
+    },
+    calculable : true,
+    xAxis : [
+        {
+            type : 'category',
+            data : name_heal
+        }
+    ],
+    yAxis : [
+        {
+            type : 'value'
+        }
+    ],
+    series : [
+        {
+            name:'累计治愈',
+            type:'bar',
+            data:heal,
+            markPoint : {
+                data : [
+                    {type : 'max', name: '最大值'},
+                    {type : 'min', name: '最小值'}
+                ]
+            },
+            markLine : {
+                data : [
+                    {type : 'average', name: '平均值'}
+                ]
+            }
+        },
+        ]
+};
+    // 使用刚指定的配置项和数据显示图表。
+    myChart.setOption(option);
+     }
+     function dead() {
+
+         var name_dead={{ name_dead|safe }}
+         var dead={{ dead|safe }}
+         var myChart = echarts.init(document.getElementById('dead'), 'dark');
+           option = {
+
+    title : {
+        text: '累计死亡城市TOP5',
+
+    },
+
+    tooltip : {
+
+        trigger: 'axis'
+
+    },
+
+    legend: {
+
+        data:['累计死亡']
+
+    },
+
+    toolbox: {
+
+        show : false,
+
+        feature : {
+
+            mark : {show: true},
+
+            dataView : {show: true, readOnly: false},
+
+            magicType : {show: true, type: ['line', 'bar']},
+
+            restore : {show: true},
+
+            saveAsImage : {show: true}
+
+        }
+
+    },
+
+    calculable : true,
+
+    xAxis : [
+
+        {
+
+            type : 'category',
+
+            data : name_dead
+
+        }
+
+    ],
+
+    yAxis : [
+
+        {
+
+            type : 'value'
+
+        }
+
+    ],
+
+    series : [
+
+        {
+
+            name:'累计死亡',
+
+            type:'bar',
+
+            data:dead,
+
+            markPoint : {
+
+                data : [
+
+                    {type : 'max', name: '最大值'},
+
+                    {type : 'min', name: '最小值'}
+
+                ]
+
+            },
+
+            markLine : {
+
+                data : [
+
+                    {type : 'average', name: '平均值'}
+
+                ]
+
+            }
+
+        },
+
+        ]
+
+};
+    // 使用刚指定的配置项和数据显示图表。
+    myChart.setOption(option);
+     }
+     function today_con() {
+
+         var name_con={{ name_con|safe }}
+         var con={{ con|safe }}
+         var myChart = echarts.init(document.getElementById('today_con'), 'dark');
+           option = {
+
+    title : {
+        text: '新增确诊城市TOP5',
+
+    },
+
+    tooltip : {
+
+        trigger: 'axis'
+
+    },
+
+    legend: {
+
+        data:['新增确诊']
+
+    },
+
+    toolbox: {
+
+        show : false,
+
+        feature : {
+
+            mark : {show: true},
+
+            dataView : {show: true, readOnly: false},
+
+            magicType : {show: true, type: ['line', 'bar']},
+
+            restore : {show: true},
+
+            saveAsImage : {show: true}
+
+        }
+
+    },
+
+    calculable : true,
+
+    xAxis : [
+
+        {
+
+            type : 'category',
+
+            data : name_con
+
+        }
+
+    ],
+
+    yAxis : [
+
+        {
+
+            type : 'value'
+
+        }
+
+    ],
+
+    series : [
+
+        {
+
+            name:'新增确诊',
+
+            type:'bar',
+
+            data:con,
+
+            markPoint : {
+
+                data : [
+
+                    {type : 'max', name: '最大值'},
+
+                    {type : 'min', name: '最小值'}
+
+                ]
+
+            },
+
+            markLine : {
+
+                data : [
+
+                    {type : 'average', name: '平均值'}
+
+                ]
+
+            }
+
+        },
+
+        ]
+
+};
+    // 使用刚指定的配置项和数据显示图表。
+    myChart.setOption(option);
+     }
+}
+</script>
+</body>
+</html>

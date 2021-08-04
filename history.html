@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>中国各省疫情历史数据时间轴</title>
+
+
+<script type="text/javascript" src="/static/echarts-5.1.2/test/lib/jquery.min.js"></script>
+<script type="text/javascript" src="/static/echarts.min.js"></script>
+<script type="text/javascript" src="/static/echarts.js"></script>
+<script type="text/javascript" src="/static/echarts-5.1.2/test/data/map/js/china.js"></script>
+<!-- <script src="./node_modules/_echarts@4.6.0@echarts/map/js/province/guangdong.js"></script> -->
+<script type="text/javascript" src="/static/echarts-5.1.2/test/data/map/js/province/"></script>
+<script type="text/javascript" src="/static/echarts-5.1.2/theme/dark.js"></script>
+<script type="text/javascript" src="/static/echarts-wordcloud.min.js"></script>
+<style>
+*{padding: 0;margin: 0;}
+#china{
+    background-color: #f1f1f1;
+}
+</style>
+<style>
+        * {
+             margin: 0;
+            padding: 0;
+       }
+
+        div {
+             border: 1px ;
+        }
+       /*整个容器*/
+         #main {
+             position: relative;
+            height: 1000px;
+         }
+         /*头部*/
+        #head {
+            position: absolute;
+            height: 5%;
+            width: 100%;
+            background: #EEF4FF;
+       }
+
+        #map {
+            position: absolute;
+            height: 95%;
+            width:100%;
+            top:5%;
+       }
+        .myway li{
+            margin-bottom:30px;
+        }
+        ul{
+				background-color: #081832;
+				list-style-type: none;
+				overflow: hidden;
+			}
+
+			li{
+				/*display与float两种方式使列表转为横向*/
+				/* display: inline; */
+				float: left;
+
+			}
+
+			li a{
+				display:block ;
+				color: #FFFFFF;
+				text-decoration: none;
+				text-align: center;
+				padding: 20px 40px;
+			}
+    li a:hover{
+				background-color:#000000 ;
+				color: #999999;
+			}
+.active{
+				background-color: #555;
+			}
+        </style>
+</head>
+<body>
+<div id="main">
+    <div id="head">
+        <ul >
+			<li ><a href={% url 'index' %}>今日疫情</a></li>
+			<li><a href={% url 'history' %}>历史疫情</a></li>
+			<li><a href={% url 'move' %}>湖北迁徙</a></li>
+			<li><a href={% url 'wordcloud' %}>百度词云</a></li>
+			<li><a href={% url 'line' %}>疫情趋势</a></li>
+            <li><a href={% url 'ranking' %}>疫情TOP5</a></li>
+            <li><a href={% url 'world' %}>世界疫情</a></li>
+		</ul>
+    </div>
+    <div id="map"></div>
+</div>
+<script>
+    window.onload = function () {
+        map();
+        function map(){
+  var myChart = echarts.init(document.getElementById('map'), 'dark');
+  var province={{ province|safe }}
+  var datalist={{ datalist|safe }}
+        function randomValue() {
+            return Math.round(Math.random()*1000);
+        }
+        option = {
+            timeline: {
+                                bottom: '6%',
+                                autoPlay: true,
+                                data: datalist,
+                            },
+            options:[
+
+                {
+                tooltip: {
+                    formatter: function (params, ticket, callback) {
+                        if(params.data){
+                return params.name+'<br/>累计确诊：'+params.data.value[3]+'<br/>新增确诊：'+params.data.value[1]+
+                    '<br/>治愈：'+params.data.value[2]+'<br/>死亡：'+params.data.value[0]
+            }
+                    }//数据格式化
+                },
+                visualMap: {
+                    min: 0,
+                    max: 1500,
+                    left: 'left',
+                    top: 'bottom',
+                    text: ['高', '低'],//取值范围的文字
+                    inRange: {
+                        color: ['#e0ffff', '#006edd']//取值范围的颜色
+                    },
+                    show: true//图注
+                },
+                geo: {
+                    map: 'china',
+                    roam: false,//不开启缩放和平移
+                    zoom: 1.23,//视角缩放比例
+                    label: {
+                        normal: {
+                            show: true,
+                            fontSize: '10',
+                            color: 'rgba(0,0,0,0.7)'
+                        }
+                    },
+                    itemStyle: {
+                        normal: {
+                            borderColor: 'rgba(0, 0, 0, 0.2)'
+                        },
+                        emphasis: {
+                            areaColor: '#F3B329',//鼠标选择区域颜色
+                            shadowOffsetX: 0,
+                            shadowOffsetY: 0,
+                            shadowBlur: 20,
+                            borderWidth: 0,
+                            shadowColor: 'rgba(0, 0, 0, 0.5)'
+                        }
+                    }
+                },
+
+                    title : {'text':'2021-2-9日疫情状况'},
+                 series: [
+
+                    {
+                        name: '疫情',
+                        type: 'map',
+                        geoIndex: 0,
+                        data: province[0]
+                    },
+
+                ],
+
+
+            },
+
+                {
+                            title : {'text':'2021-2-10日疫情状况'},
+                            series : [
+                                {
+                        name: '疫情',
+                        type: 'map',
+                        geoIndex: 0,
+                        data: province[1]
+                    },
+                            ]
+                        },
+                {
+                            title : {'text':'2021-2-11日疫情状况'},
+                            series : [
+                                {
+                        name: '疫情',
+                        type: 'map',
+                        geoIndex: 0,
+                        data: province[2]
+                    },
+                            ]
+                        },
+                {
+                            title : {'text':'2021-2-12日疫情状况'},
+                            series : [
+                                {
+                        name: '疫情',
+                        type: 'map',
+                        geoIndex: 0,
+                        data: province[3]
+                    },
+                            ]
+                        },
+                {
+                            title : {'text':'2021-2-13日疫情状况'},
+                            series : [
+                                {
+                        name: '疫情',
+                        type: 'map',
+                        geoIndex: 0,
+                        data: province[4]
+                    },
+                            ]
+                        },
+                {
+                            title : {'text':'2021-2-14日疫情状况'},
+                            series : [
+                                {
+                        name: '疫情',
+                        type: 'map',
+                        geoIndex: 0,
+                        data: province[5]
+                    },
+                            ]
+                        },
+                  {
+                            title : {'text':'2021-2-15日疫情状况'},
+                            series : [
+                                {
+                        name: '疫情',
+                        type: 'map',
+                        geoIndex: 0,
+                        data: province[6]
+                    },
+                            ]
+                        },
+                  {
+                            title : {'text':'2021-2-16日疫情状况'},
+                            series : [
+                                {
+                        name: '疫情',
+                        type: 'map',
+                        geoIndex: 0,
+                        data: province[7]
+                    },
+                            ]
+                        },
+                  {
+                            title : {'text':'2021-2-17日疫情状况'},
+                            series : [
+                                {
+                        name: '疫情',
+                        type: 'map',
+                        geoIndex: 0,
+                        data: province[8]
+                    },
+                            ]
+                        },
+                  {
+                            title : {'text':'2021-2-18日疫情状况'},
+                            series : [
+                                {
+                        name: '疫情',
+                        type: 'map',
+                        geoIndex: 0,
+                        data: province[9]
+                    },
+                            ]
+                        },
+
+            ]};
+
+
+        myChart.setOption(option);
+        myChart.on('click', function (params) {
+            alert(params.name);
+        });
+
+
+}}
+</script>
+
+</body>
+</html>

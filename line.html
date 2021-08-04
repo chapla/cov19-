@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>中国各省疫情历史数据时间轴</title>
+
+
+<script type="text/javascript" src="/static/echarts-5.1.2/test/lib/jquery.min.js"></script>
+<script type="text/javascript" src="/static/echarts.min.js"></script>
+<script type="text/javascript" src="/static/echarts.js"></script>
+<script type="text/javascript" src="/static/echarts-5.1.2/test/data/map/js/china.js"></script>
+<!-- <script src="./node_modules/_echarts@4.6.0@echarts/map/js/province/guangdong.js"></script> -->
+<script type="text/javascript" src="/static/echarts-5.1.2/test/data/map/js/province/"></script>
+<script type="text/javascript" src="/static/echarts-5.1.2/theme/dark.js"></script>
+<script type="text/javascript" src="/static/echarts-wordcloud.min.js"></script>
+<style>
+*{padding: 0;margin: 0;}
+#china{
+    background-color: #f1f1f1;
+}
+</style>
+<style>
+        * {
+             margin: 0;
+            padding: 0;
+       }
+
+        div {
+             border: 1px ;
+        }
+       /*整个容器*/
+         #main {
+             position: relative;
+            height: 1000px;
+         }
+         /*头部*/
+        #head {
+            position: absolute;
+            height: 5%;
+            width: 100%;
+            background: #EEF4FF;
+       }
+
+        #line {
+            position: absolute;
+            height: 95%;
+            width:50%;
+            top:5%;
+       }
+        #line1 {
+            position: absolute;
+            height: 95%;
+            width:50%;
+            left: 50%;
+            top:5%;
+       }
+        .myway li{
+            margin-bottom:30px;
+        }
+        ul{
+				background-color: #081832;
+				list-style-type: none;
+				overflow: hidden;
+			}
+
+			li{
+				/*display与float两种方式使列表转为横向*/
+				/* display: inline; */
+				float: left;
+
+			}
+
+			li a{
+				display:block ;
+				color: #FFFFFF;
+				text-decoration: none;
+				text-align: center;
+				padding: 20px 40px;
+			}
+    li a:hover{
+				background-color:#000000 ;
+				color: #999999;
+			}
+.active{
+				background-color: #555;
+			}
+        </style>
+</head>
+<body>
+<div id="main">
+    <div id="head">
+        <ul >
+			<li ><a href={% url 'index' %}>今日疫情</a></li>
+			<li><a href={% url 'history' %}>历史疫情</a></li>
+			<li><a href={% url 'move' %}>湖北迁徙</a></li>
+			<li><a href={% url 'wordcloud' %}>百度词云</a></li>
+			<li><a href={% url 'line' %}>疫情趋势</a></li>
+            <li><a href={% url 'ranking' %}>疫情TOP5</a></li>
+            <li><a href={% url 'world' %}>世界疫情</a></li>
+		</ul>
+    </div>
+    <div id="line"></div>
+    <div id="line1"></div>
+</div>
+<script>
+    window.onload = function () {
+        line();
+        line1();
+    function line() {
+              var confirm={{ confirm|safe }}
+  var suspect={{ suspect|safe }}
+  var heal={{ heal|safe }}
+  var dead={{ dead|safe }}
+  var data={{ data|safe }}
+            // 基于准备好的dom，初始化echarts实例
+            var myChart = echarts.init(document.getElementById('line'),"dark");
+
+            // 指定图表的配置项和数据
+            var option = {
+    title: {
+        text: '全国疫情累计趋势',
+        top: '2%',
+        color: '#FFD068'
+    },
+     dataZoom:[
+    {
+        type:"slider",//slider表示有滑动块的，
+        show:true,
+        xAxisIndex:[0],//表示x轴折叠
+        start:1,//数据窗口范围的起始百分比,表示1%
+        end:35//数据窗口范围的结束百分比,表示35%坐标
+    },
+
+],
+    tooltip: {
+        trigger: 'axis'
+    },
+    legend: {
+        data: ['累计确诊', '现有疑似', '累计治愈', '累计死亡'],
+        padding:[50,20,0,0]
+    },
+    grid: {
+        top:'20%',
+        left: '3%',
+        right: '4%',
+        bottom: '10%',
+        containLabel: true
+    },
+    xAxis: {
+        type: 'category',
+        boundaryGap: false,
+        data: data
+    },
+    yAxis: {
+        type: 'value'
+    },
+
+    series: [
+        {
+            name: '累计确诊',
+            type: 'line',
+            stack: '总量',
+            data: confirm
+        },
+        {
+            name: '现有疑似',
+            type: 'line',
+            stack: '总量',
+            data: suspect
+        },
+        {
+            name: '累计治愈',
+            type: 'line',
+            stack: '总量',
+            data: heal
+        },
+        {
+            name: '累计死亡',
+            type: 'line',
+            stack: '总量',
+            data: dead
+        }
+
+    ]
+
+            };
+            // 使用刚指定的配置项和数据显示图表。
+            myChart.setOption(option);
+        }
+    function line1() {
+  var data={{ data|safe }}
+  var confirm_add={{ confirm_add|safe }}
+  var suspect_add={{ suspect_add|safe }}
+  var heal_add={{ heal_add|safe }}
+  var dead_add={{ dead_add|safe }}
+            // 基于准备好的dom，初始化echarts实例
+            var myChart = echarts.init(document.getElementById('line1'),"dark");
+
+            // 指定图表的配置项和数据
+            var option = {
+    title: {
+        text: '全国疫情新增趋势',
+        top: '2%',
+        color: '#FFD068'
+    },
+    dataZoom:[
+    {
+        type:"slider",//slider表示有滑动块的，
+        show:true,
+        xAxisIndex:[0],//表示x轴折叠
+        start:1,//数据窗口范围的起始百分比,表示1%
+        end:35//数据窗口范围的结束百分比,表示35%坐标
+    }
+
+],
+    tooltip: {
+        trigger: 'axis'
+    },
+
+    legend: {
+        data: ['新增确诊', '新增疑似', '新增治愈', '新增死亡'],
+        padding:[50,20,0,0]
+    },
+    grid: {
+        top:'20%',
+        left: '3%',
+        right: '4%',
+        bottom: '10%',
+        containLabel: true
+    },
+    xAxis: {
+        type: 'category',
+        boundaryGap: false,
+        data: data
+    },
+    yAxis: {
+        type: 'value'
+    },
+
+    series: [
+        {
+            name: '新增确诊',
+            type: 'line',
+            stack: '总量',
+            data: confirm_add
+        },
+        {
+            name: '新增疑似',
+            type: 'line',
+            stack: '总量',
+            data: suspect_add
+        },
+        {
+            name: '新增治愈',
+            type: 'line',
+            stack: '总量',
+            data: heal_add
+        },
+        {
+            name: '新增死亡',
+            type: 'line',
+            stack: '总量',
+            data: dead_add
+        }
+
+    ]
+            };
+            // 使用刚指定的配置项和数据显示图表。
+            myChart.setOption(option);
+        }
+
+}
+</script>
+
+</body>
+</html>

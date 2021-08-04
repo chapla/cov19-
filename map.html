@@ -1,0 +1,835 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>全国疫情追踪</title>
+<style>
+*{padding: 0;margin: 0;}
+#china{
+    background-color: #f1f1f1;
+}
+</style>
+<style>
+        * {
+             margin: 0;
+            padding: 0;
+       }
+
+        div {
+             border: 1px ;
+        }
+       /*整个容器*/
+         #main {
+             position: relative;
+            height: 1000px;
+         }
+         /*头部*/
+        #line {
+            position: absolute;
+          height: 50%;
+            width: 32%;
+       }
+        #head {
+            position: absolute;
+          height: 10%;
+            left: 32%;
+            width: 32%;
+
+       }
+        #head1 {
+            position: absolute;
+          height: 20%;
+            left: 32%;
+            width: 32%;
+            top: 10%;
+       }
+        #head1_1 {
+            position: absolute;
+          height: 10%;
+            left: 32%;
+            width: 32%;
+            top: 30%;
+       }
+        #move {
+            position: absolute;
+          height: 50%;
+            left: 64%;
+            width: 36%;
+       }
+        /*左部*/
+      #line1 {
+             width: 32%;
+             position: absolute;
+             height: 50%;
+             top: 50%;
+      }
+       /*内容部分*/
+        #china {
+           position: absolute;
+            top: 40%;
+            left: 32%;
+            width: 32%;
+           height: 60%;
+
+         }
+        #word {
+           position: absolute;
+            top: 50%;
+            left: 64%;
+            width: 36%;
+           height: 50%;
+
+         }
+     </style>
+</head>
+<body >
+
+<div id="main">
+         <div id="line"></div>
+        <div id="head"></div>
+         <div id="head1"></div>
+        <div id="head1_1"></div>
+         <div id="move"></div>
+        <div id="line1"></div>
+        <div id="china"></div>
+       <div id="word"></div>
+    </div>
+
+
+<script type="text/javascript" src="/static/echarts-5.1.2/test/lib/jquery.min.js"></script>
+<script type="text/javascript" src="/static/echarts.min.js"></script>
+<script type="text/javascript" src="/static/echarts.js"></script>
+<script type="text/javascript" src="/static/echarts-5.1.2/test/data/map/js/china.js"></script>
+<!-- <script src="./node_modules/_echarts@4.6.0@echarts/map/js/province/guangdong.js"></script> -->
+<script type="text/javascript" src="/static/echarts-5.1.2/test/data/map/js/province/"></script>
+<script type="text/javascript" src="/static/echarts-5.1.2/theme/dark.js"></script>
+<script type="text/javascript" src="/static/echarts-wordcloud.min.js"></script>
+
+
+<script type="text/javascript">
+window.onload = function () {
+        map();
+        line();
+        txt();
+        title();
+        data();
+        line1();
+        word();
+        move();
+        function map(){
+  var myChart = echarts.init(document.getElementById('china'), 'dark');
+  var result1={{ result1|safe }}
+  var result3={{ result3|safe }}
+
+
+var option = {
+
+    tooltip:{
+        show:true,
+        formatter:function(params){
+            if(params.data){
+                return params.name+'<br/>累计确诊：'+params.data.value[3]+'<br/>新增确诊：'+params.data.value[1]+
+                    '<br/>治愈：'+params.data.value[2]+'<br/>死亡：'+params.data.value[0]
+            }
+        }
+    },
+    visualMap: {
+        show: true,
+        splitNumber: 4,
+        type:'piecewise',
+        orient: 'horizontal', //控制条横向
+        bottom:20,
+        textStyle: {
+              color: '#999'
+            },
+        pieces: [{
+                min: 0,
+                max: 500,
+                color: '#FFD068',
+                label: '0-500人'
+              },
+              {
+                min: 500,
+                max: 1000,
+                color: '#FF9B52',
+                label: '500-1000人'
+              },
+              {
+                min: 1000,
+                max: 2000,
+                color: '#E54D09',
+                label: '1000-2000人'
+              },
+            {
+                min: 2000,
+                max: 4000,
+                color: '#B22222',
+                label: '2000-4000人'
+              },
+            {
+                min: 4000,
+                max: 100000,
+                color: '#800000',
+                label: '>4000人'
+              }
+            ]
+
+
+          //
+        // calculable: true, //是否显示拖把
+    },
+    series:[
+        {
+            type:'map',
+            mapType:'china',
+            // roam:true,
+            label: {
+                show: true
+            },
+            // 区域颜色
+            itemStyle:{
+                areaColor:'#F0FFFF'
+            },
+            //鼠标聚焦时的区域颜色
+            emphasis:{
+                itemStyle:{
+                    areaColor:'#ADD8E6'
+                }
+            },
+            //虚拟数据
+            data:result1,
+
+
+
+        }
+    ],
+};
+console.log(result1)
+myChart.setOption(option);
+
+//定义全国省份的数组
+var cityArr=[
+    ['上海', '河北', '山西', '内蒙古', '辽宁', '吉林','黑龙江',  '江苏', '浙江', '安徽', '福建', '江西', '山东','河南', '湖北', '湖南', '广东', '广西', '海南', '四川', '贵州', '云南', '西藏', '陕西', '甘肃', '青海', '宁夏', '新疆', '北京', '天津', '重庆', '香港', '澳门', '台湾'],
+    ['shanghai', 'hebei','shanxi','neimenggu','liaoning','jilin','heilongjiang','jiangsu','zhejiang','anhui','fujian','jiangxi','shandong','henan','hubei','hunan','guangdong','guangxi','hainan','sichuan','guizhou','yunnan','xizang','shanxi1','gansu','qinghai','ningxia','xinjiang', 'beijing', 'tianjin', 'chongqing', 'xianggang', 'aomen', 'taiwan']
+];
+
+myChart.on('click', function (param) {
+    // 城市中文名
+    var cityName = param.name;
+    // 查找是否有对应城市有则加载城市
+    for(var i=0,len=cityArr[0].length;i<len;i++){
+        if(cityName==cityArr[0][i]){
+            // 获取得城市拼音
+            showCity(cityArr[0][i], cityArr[1][i]);
+            return;
+        }
+    }
+    //没有找到对应城市的话，那么返回到全国地图
+    option.series[0].mapType='china';
+
+    myChart.setOption(option);
+});
+
+
+// 定义省份
+
+function showCity(zhName, pyName){
+    console.log(zhName, pyName);
+    $.getScript('/static/echarts-5.1.2/test/data/map/js/province/'+pyName+'.js', function(){
+        // 设定中文省份名才能显示相关省份，之后想要设置什么数据，直接设置到option这里就可以了
+        option.series[0].mapType=zhName;
+
+        // 深拷贝，另建option以免丢失原始option数据
+        var cityOption = JSON.parse(JSON.stringify(option));
+        // 模拟虚拟数据
+        if(zhName=='上海'){
+            cityOption.series[0].data=result3[0]
+        }else if(zhName=='河北'){
+            cityOption.series[0].data=result3[1]
+        }else if(zhName=='山西'){
+            cityOption.series[0].data=result3[2]
+        }else if(zhName=='内蒙古'){
+            cityOption.series[0].data=result3[3]
+        }else if(zhName=='辽宁'){
+            cityOption.series[0].data=result3[4]
+        }else if(zhName=='吉林'){
+            cityOption.series[0].data=result3[5]
+        }else if(zhName=='黑龙江'){
+            cityOption.series[0].data=result3[6]
+        }else if(zhName=='江苏'){
+            cityOption.series[0].data=result3[7]
+        }else if(zhName=='浙江'){
+            cityOption.series[0].data=result3[8]
+        }else if(zhName=='安徽'){
+            cityOption.series[0].data=result3[9]
+        }else if(zhName=='福建'){
+            cityOption.series[0].data=result3[10]
+        }else if(zhName=='江西'){
+            cityOption.series[0].data=result3[11]
+        }else if(zhName=='山东'){
+            cityOption.series[0].data=result3[12]
+        }else if(zhName=='河南'){
+            cityOption.series[0].data=result3[13]
+        }else if(zhName=='湖北'){
+            cityOption.series[0].data=result3[14]
+        }else if(zhName=='湖南'){
+            cityOption.series[0].data=result3[15]
+        }else if(zhName=='广东'){
+            cityOption.series[0].data=result3[16]
+        }else if(zhName=='广西'){
+            cityOption.series[0].data=result3[17]
+        }else if(zhName=='海南'){
+            cityOption.series[0].data=result3[18]
+        }else if(zhName=='四川'){
+            cityOption.series[0].data=result3[19]
+        }else if(zhName=='贵州'){
+            cityOption.series[0].data=result3[20]
+        }else if(zhName=='云南'){
+            cityOption.series[0].data=result3[21]
+        }else if(zhName=='西藏'){
+            cityOption.series[0].data=result3[22]
+        }else if(zhName=='陕西'){
+            cityOption.series[0].data=result3[23]
+        }else if(zhName=='甘肃'){
+            cityOption.series[0].data=result3[24]
+        }else if(zhName=='青海'){
+            cityOption.series[0].data=result3[25]
+        }else if(zhName=='宁夏'){
+            cityOption.series[0].data=result3[26]
+        }else if(zhName=='新疆'){
+            cityOption.series[0].data=result3[27]
+        }else if(zhName=='北京'){
+            cityOption.series[0].data=result3[28]
+        }else if(zhName=='天津'){
+            cityOption.series[0].data=result3[29]
+        }else if(zhName=='重庆'){
+            cityOption.series[0].data=result3[30]
+        }else if(zhName=='香港'){
+            cityOption.series[0].data=result3[31]
+        }else if(zhName=='澳门'){
+            cityOption.series[0].data=result3[32]
+        }else if(zhName=='台湾'){
+            cityOption.series[0].data=result3[33]
+        }
+
+        myChart.setOption(cityOption);
+    });
+}
+
+// 地图跟随浏览器缩放
+window.onresize=function(){
+    myChart.resize();
+}}
+function line() {
+              var confirm={{ confirm|safe }}
+  var suspect={{ suspect|safe }}
+  var heal={{ heal|safe }}
+  var dead={{ dead|safe }}
+  var data={{ data|safe }}
+            // 基于准备好的dom，初始化echarts实例
+            var myChart = echarts.init(document.getElementById('line'),"dark");
+
+            // 指定图表的配置项和数据
+            var option = {
+    title: {
+        text: '全国疫情累计趋势',
+        top: '2%',
+        color: '#FFD068'
+    },
+     dataZoom:[
+    {
+        type:"slider",//slider表示有滑动块的，
+        show:true,
+        xAxisIndex:[0],//表示x轴折叠
+        start:1,//数据窗口范围的起始百分比,表示1%
+        end:35//数据窗口范围的结束百分比,表示35%坐标
+    },
+
+],
+    tooltip: {
+        trigger: 'axis'
+    },
+    legend: {
+        data: ['累计确诊', '现有疑似', '累计治愈', '累计死亡'],
+        padding:[50,20,0,0]
+    },
+    grid: {
+        top:'20%',
+        left: '3%',
+        right: '4%',
+        bottom: '10%',
+        containLabel: true
+    },
+    xAxis: {
+        type: 'category',
+        boundaryGap: false,
+        data: data
+    },
+    yAxis: {
+        type: 'value'
+    },
+
+    series: [
+        {
+            name: '累计确诊',
+            type: 'line',
+            stack: '总量',
+            data: confirm
+        },
+        {
+            name: '现有疑似',
+            type: 'line',
+            stack: '总量',
+            data: suspect
+        },
+        {
+            name: '累计治愈',
+            type: 'line',
+            stack: '总量',
+            data: heal
+        },
+        {
+            name: '累计死亡',
+            type: 'line',
+            stack: '总量',
+            data: dead
+        }
+
+    ]
+
+            };
+            // 使用刚指定的配置项和数据显示图表。
+            myChart.setOption(option);
+        }
+        function title(){
+
+  var myChart = echarts.init(document.getElementById('head'), 'dark');
+    var option = {
+    title: {
+        text: '全 国 疫 情 追 踪',
+        textAlign: 'center',
+                left: '45%',
+                top: '40%',
+                textStyle: {
+                    fontSize: 40,
+                }
+    },
+            };
+            // 使用刚指定的配置项和数据显示图表。
+            myChart.setOption(option);
+        }
+
+        function txt(){
+
+  var myChart = echarts.init(document.getElementById('head1_1'), 'dark');
+    var option = {
+    title: {
+        text: '累计确诊  新增确诊  累计治愈  累计死亡',
+        textAlign: 'center',
+                left: '47%',
+                top: '5',
+                textStyle: {
+                    fontSize: 25,
+
+                }
+    },
+
+            };
+            // 使用刚指定的配置项和数据显示图表。
+            myChart.setOption(option);
+        }
+        function data(){
+
+  var myChart = echarts.init(document.getElementById('head1'), 'dark');
+  var today_data = {{ today_data|safe }}
+    var option = {
+    title: {
+        text: today_data,
+        textAlign: 'center',
+                left: '45%',
+                top: '55%',
+                textStyle: {
+                    fontSize: 25,
+                    color: '#FF9B52',
+                }
+    },
+            };
+            // 使用刚指定的配置项和数据显示图表。
+            myChart.setOption(option);
+        }
+
+        function line1() {
+  var data={{ data|safe }}
+  var confirm_add={{ confirm_add|safe }}
+  var suspect_add={{ suspect_add|safe }}
+  var heal_add={{ heal_add|safe }}
+  var dead_add={{ dead_add|safe }}
+            // 基于准备好的dom，初始化echarts实例
+            var myChart = echarts.init(document.getElementById('line1'),"dark");
+
+            // 指定图表的配置项和数据
+            var option = {
+    title: {
+        text: '全国疫情新增趋势',
+
+        color: '#FFD068'
+    },
+    dataZoom:[
+    {
+        type:"slider",//slider表示有滑动块的，
+        show:true,
+        xAxisIndex:[0],//表示x轴折叠
+        start:1,//数据窗口范围的起始百分比,表示1%
+        end:35//数据窗口范围的结束百分比,表示35%坐标
+    }
+
+],
+    tooltip: {
+        trigger: 'axis'
+    },
+
+    legend: {
+        data: ['新增确诊', '新增疑似', '新增治愈', '新增死亡'],
+        padding:[50,20,0,0]
+    },
+    grid: {
+        top:'20%',
+        left: '3%',
+        right: '4%',
+        bottom: '10%',
+        containLabel: true
+    },
+    xAxis: {
+        type: 'category',
+        boundaryGap: false,
+        data: data
+    },
+    yAxis: {
+        type: 'value'
+    },
+
+    series: [
+        {
+            name: '新增确诊',
+            type: 'line',
+            stack: '总量',
+            data: confirm_add
+        },
+        {
+            name: '新增疑似',
+            type: 'line',
+            stack: '总量',
+            data: suspect_add
+        },
+        {
+            name: '新增治愈',
+            type: 'line',
+            stack: '总量',
+            data: heal_add
+        },
+        {
+            name: '新增死亡',
+            type: 'line',
+            stack: '总量',
+            data: dead_add
+        }
+
+    ]
+            };
+            // 使用刚指定的配置项和数据显示图表。
+            myChart.setOption(option);
+        }
+    function word() {
+        var myChart = echarts.init(document.getElementById('word'),"dark");
+        var context ={{ context|safe }}
+        var option = {
+            title: {
+                text: '百度热搜词云',
+                x: "center"
+            },
+
+            series: [
+                {
+                    type: "wordCloud",
+                    //用来调整词之间的距离
+                    gridSize: 5,
+                    //用来调整字的大小范围
+                    // Text size range which the value in data will be mapped to.
+                    // Default to have minimum 12px and maximum 60px size.
+                    sizeRange: [14, 50],
+                    // Text rotation range and step in degree. Text will be rotated randomly in range [-90,                                                                             90] by rotationStep 45
+                    //用来调整词的旋转方向，，[0,0]--代表着没有角度，也就是词为水平方向，需要设置角度参考注释内容
+                    rotationRange: [-0, 0, 0, 0],
+
+                    //随机生成字体颜色
+                    textStyle: {
+                        normal: {
+                            color: function () {
+                                return (
+                                    "rgb(" +
+                                    Math.round(Math.random() * 255) +
+                                    ", " +
+                                    Math.round(Math.random() * 255) +
+                                    ", " +
+                                    Math.round(Math.random() * 255) +
+                                    ")"
+                                );
+                            }
+                        }
+                    },
+                    //位置相关设置
+                    left: "center",
+                    top: "center",
+                    right: null,
+                    bottom: null,
+                    width: "80%",
+                    height: "80%",
+                    //数据
+                    data: context,
+                }
+            ]
+        };
+        myChart.setOption(option);
+        // 点击某个字
+        myChart.on('click', function (params) {
+            console.log('myChart----click---:', params, '------', params.data)
+        });
+
+            }
+    function move() {
+        var myChart = echarts.init(document.getElementById('move'),"dark");
+        var geoCoordMap = { //可以在地图上显示的城市的坐标信息
+            '北京': [116.46, 39.92],
+
+'上海': [121.48, 31.22],
+
+'天津': [117.2, 39.13],
+
+'重庆': [106.54, 29.59],
+
+'河北': [114.48, 38.03],
+
+'山西': [112.53, 37.87],
+
+'辽宁': [123.38, 41.8],
+
+'吉林': [125.35, 43.88],
+
+'黑龙江': [126.63, 45.75],
+
+'浙江': [120.19, 30.26],
+
+'福建': [119.3, 26.08],
+
+'山东': [106.54, 29.59],
+
+'河南': [113.65, 34.76],
+
+'湖北': [114.31, 30.52],
+
+'湖南': [113, 28.21],
+
+'广东': [113.23, 23.16],
+
+'海南': [110.35, 20.02],
+
+'四川': [104.06, 30.67],
+'贵州': [106.71, 26.57],
+
+'云南': [102.73, 25.04],
+
+'江西': [115.89, 28.68],
+
+'陕西': [108.95, 34.27],
+
+'青海': [101.74, 36.56],
+
+'甘肃': [103.73, 36.03],
+
+'广西': [106.54, 29.59],
+
+'新疆': [87.68, 43.77],
+
+'内蒙古': [111.65, 40.82],
+
+'西藏': [91.11, 29.97],
+
+'宁夏': [106.27, 38.47],
+
+'台湾': [121.5, 25.14],
+
+'香港': [114.1, 22.2],
+
+'澳门': [113.33, 22.13],
+
+'安徽': [117.27, 31.86],
+'合肥': [117.29, 32.0581],
+'江苏': [118.78, 32.04]
+        };
+        var HFData = [ // 数据中name的城市名称必须与geoCoordMap中城市名称一致, 不然关联不上，合肥到各地区的线路
+            [{'name': '湖北'}, {'name': '重庆', value: 6}], [{'name': '湖北'}, {'name': '湖南', value: 5}], [{'name': '湖北'}, {'name': '上海', 'value': 3}], [{'name': '湖北'}, {'name': '河南', 'value': 3}], [{'name': '湖北'}, {'name': '北京', 'value': 3}], [{'name': '湖北'}, {'name': '江西', 'value': 3}], [{'name': '湖北'}, {'name': '湖南', 'value': 2}], [{'name': '湖北'}, {'name': '河南', 'value': 2}], [{'name': '湖北'}, {'name': '河南', 'value': 2}], [{'name': '湖北'}, {'name': '四川', 'value': 2}], [{'name': '湖北'}, {'name': '浙江', 'value': 1}], [{'name': '湖北'}, {'name': '陕西', 'value': 1}], [{'name': '湖北'}, {'name': '江苏', 'value': 1}], [{'name': '湖北'}, {'name': '湖南', 'value': 1}], [{'name': '湖北'}, {'name': '江西', 'value': 1}], [{'name': '湖北'}, {'name': '安徽', 'value': 1}], [{'name': '湖北'}, {'name': '江苏', 'value': 1}], [{'name': '湖北'}, {'name': '湖南', 'value': 1}], [{'name': '湖北'}, {'name': '广东', 'value': 1}], [{'name': '湖北'}, {'name': '河南', 'value': 1}], [{'name': '湖北'}, {'name': '浙江', 'value': 1}], [{'name': '湖北'}, {'name': '安徽', 'value': 0}], [{'name': '湖北'}, {'name': '浙江', 'value': 0}], [{'name': '湖北'}, {'name': '云南', 'value': 0}], [{'name': '湖北'}, {'name': '天津', 'value': 0}], [{'name': '湖北'}, {'name': '陕西', 'value': 0}], [{'name': '湖北'}, {'name': '浙江', 'value': 0}], [{'name': '湖北'}, {'name': '广东', 'value': 0}], [{'name': '湖北'}, {'name': '广东', 'value': 0}], [{'name': '湖北'}, {'name': '江苏', 'value': 0}], [{'name': '湖北'}, {'name': '福建', 'value': 0}], [{'name': '湖北'}, {'name': '贵州', 'value': 0}], [{'name': '湖北'}, {'name': '安徽', 'value': 0}], [{'name': '湖北'}, {'name': '山东', 'value': 0}], [{'name': '湖北'}, {'name': '福建', 'value': 0}], [{'name': '湖北'}, {'name': '湖南', 'value': 0}], [{'name': '湖北'}, {'name': '浙江', 'value': 0}], [{'name': '湖北'}, {'name': '河南', 'value': 0}], [{'name': '湖北'}, {'name': '湖南', 'value': 0}], [{'name': '湖北'}, {'name': '河南', 'value': 0}], [{'name': '湖北'}, {'name': '安徽', 'value': 0}], [{'name': '湖北'}, {'name': '浙江', 'value': 0}], [{'name': '湖北'}, {'name': '河北', 'value': 0}], [{'name': '湖北'}, {'name': '山东', 'value': 0}], [{'name': '湖北'}, {'name': '江西', 'value': 0}], [{'name': '湖北'}, {'name': '广西', 'value': 0}], [{'name': '湖北'}, {'name': '河北', 'value': 0}], [{'name': '湖北'}, {'name': '湖南', 'value': 0}], [{'name': '湖北'}, {'name': '湖南', 'value': 0}], [{'name': '湖北'}, {'name': '江西', 'value': 0}], [{'name': '湖北'}, {'name': '江苏', 'value': 0}], [{'name': '湖北'}, {'name': '广东', 'value': 0}], [{'name': '湖北'}, {'name': '福建', 'value': 0}], [{'name': '湖北'}, {'name': '河南', 'value': 0}], [{'name': '湖北'}, {'name': '河南', 'value': 0}], [{'name': '湖北'}, {'name': '河南', 'value': 0}], [{'name': '湖北'}, {'name': '湖南', 'value': 0}], [{'name': '湖北'}, {'name': '甘肃', 'value': 0}], [{'name': '湖北'}, {'name': '河南', 'value': 0}], [{'name': '湖北'}, {'name': '江苏', 'value': 0}], [{'name': '湖北'}, {'name': '海南', 'value': 0}], [{'name': '湖北'}, {'name': '江西', 'value': 0}], [{'name': '湖北'}, {'name': '河南', 'value': 0}], [{'name': '湖北'}, {'name': '海南', 'value': 0}], [{'name': '湖北'}, {'name': '辽宁', 'value': 0}], [{'name': '湖北'}, {'name': '浙江', 'value': 0}], [{'name': '湖北'}, {'name': '安徽', 'value': 0}], [{'name': '湖北'}, {'name': '广西', 'value': 0}], [{'name': '湖北'}, {'name': '江苏', 'value': 0}], [{'name': '湖北'}, {'name': '新疆', 'value': 0}], [{'name': '湖北'}, {'name': '河北', 'value': 0}], [{'name': '湖北'}, {'name': '河南', 'value': 0}], [{'name': '湖北'}, {'name': '山西', 'value': 0}], [{'name': '湖北'}, {'name': '江西', 'value': 0}], [{'name': '湖北'}, {'name': '浙江', 'value': 0}], [{'name': '湖北'}, {'name': '河南', 'value': 0}], [{'name': '湖北'}, {'name': '湖南', 'value': 0}], [{'name': '湖北'}, {'name': '山东', 'value': 0}], [{'name': '湖北'}, {'name': '广东', 'value': 0}], [{'name': '湖北'}, {'name': '山东', 'value': 0}], [{'name': '湖北'}, {'name': '江苏', 'value': 0}], [{'name': '湖北'}, {'name': '湖南', 'value': 0}], [{'name': '湖北'}, {'name': '广东', 'value': 0}], [{'name': '湖北'}, {'name': '贵州', 'value': 0}], [{'name': '湖北'}, {'name': '山东', 'value': 0}], [{'name': '湖北'}, {'name': '山东', 'value': 0}], [{'name': '湖北'}, {'name': '河南', 'value': 0}], [{'name': '湖北'}, {'name': '陕西', 'value': 0}], [{'name': '湖北'}, {'name': '河北', 'value': 0}], [{'name': '湖北'}, {'name': '黑龙江', 'value': 0}], [{'name': '湖北'}, {'name': '四川', 'value': 0}], [{'name': '湖北'}, {'name': '吉林', 'value': 0}], [{'name': '湖北'}, {'name': '辽宁', 'value': 0}], [{'name': '湖北'}, {'name': '湖南', 'value': 0}], [{'name': '湖北'}, {'name': '江苏', 'value': 0}], [{'name': '湖北'}, {'name': '广东', 'value': 0}], [{'name': '湖北'}, {'name': '江西', 'value': 0}], [{'name': '湖北'}, {'name': '青海', 'value': 0}], [{'name': '湖北'}, {'name': '安徽', 'value': 0}], [{'name': '湖北'}, {'name': '河北', 'value': 0}]
+
+
+        ];
+        var planePath = 'arrow'; // 箭头的svg
+        // push进去线路开始-结束地点-经纬度
+        var convertData = function(data) {
+            var res = [];
+            for (var i = 0; i < data.length; i++) {
+                var dataItem = data[i];
+                var fromCoord = geoCoordMap[dataItem[0].name];
+                var toCoord = geoCoordMap[dataItem[1].name];
+                if (fromCoord && toCoord) {
+                    res.push([{
+                        coord: fromCoord
+                    }, {
+                        coord: toCoord
+                    }]);
+                }
+            }
+            return res;
+        };
+        var color = ['#fff', '#FFFFA8', '#46bee9']; //圆圈和字的颜色，线的颜色，箭头颜色
+        // 数据
+        var series = [];
+        // 遍历由合肥到其他城市的线路
+        [
+            ['湖北', HFData]
+        ].forEach(function(item, i) {
+            // 配置
+            series.push({
+                // 系列名称，用于tooltip的显示
+                name: item[0],
+                type: 'lines',
+                zlevel: 1, // 用于 Canvas 分层，不同zlevel值的图形会放置在不同的 Canvas 中
+                // effect出发到目的地 的白色尾巴线条
+                // 线特效的配置
+                effect: {
+                    show: true,
+                    period: 6, // 特效动画的时间，单位为 s
+                    trailLength: 0.1, // 特效尾迹的长度。取从 0 到 1 的值，数值越大尾迹越长
+                    color: '#46bee9', // 移动箭头颜色
+                    symbol: planePath,
+                    symbolSize: 6 // 特效标记的大小
+                },
+                // lineStyle出发到目的地 的线条颜色
+                lineStyle: {
+                    normal: {
+                        color: color[i],
+                        width: 0,
+                        curveness: 0.2 //幅度
+                    }
+                },
+                data: convertData(item[1]) //开始到结束数据
+            }, {
+                //出发地信息
+                name: item[0],
+                type: 'lines',
+                zlevel: 2,
+                effect: {
+                    show: true,
+                    period: 6,
+                    trailLength: 0,
+                    symbol: planePath,
+                    symbolSize: 6
+                },
+                lineStyle: {
+                    normal: {
+                        color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{
+                            offset: 0,
+                            color: '#FFFFA8' // 出发
+                        }, {
+                            offset: 1,
+                            color: '#58B3CC' // 结束 颜色
+                        }], false),
+                        width: 1.5,
+                        opacity: 0.4,
+                        curveness: 0.2
+                    }
+                },
+                data: convertData(item[1])
+            }, {
+                // 目的地信息
+                name: item[0],
+                type: 'effectScatter',
+                coordinateSystem: 'geo',
+                zlevel: 2,
+                rippleEffect: {
+                    brushType: 'stroke'
+                },
+                label: {
+                    normal: {
+                        show: true,
+                        position: 'right',
+                        formatter: '{b}'
+                    }
+                },
+                symbolSize: function(val) {
+                    return val[2] / 8;
+                },
+                itemStyle: {
+                    normal: {
+                        color: color[i]
+                    }
+                },
+                data: item[1].map(function(dataItem) {
+                    return {
+                        name: dataItem[1].name,
+                        value: geoCoordMap[dataItem[1].name].concat([dataItem[1].value])
+                    };
+                })
+            });
+        });
+
+        // 指定相关的配置项和数据
+        var mapBoxOption = {
+            geo: {
+                map: 'china',
+                roam: false, // 是否开启鼠标缩放和平移漫游。默认不开启。如果只想要开启缩放或者平移，可以设置成 'scale' 或者 'move'。设置成 true 为都开启
+                aspectScale: 0.75,
+                zoom: 1.20,
+                label: {
+                    normal: {
+                        show: false,
+                        textStyle: {
+                            color: '#00a0c9'
+                        }
+                    },
+                    emphasis: { // 对应的鼠标悬浮效果
+                        show: false,
+                        textStyle: {
+                            color: "#00a0c9"
+                        }
+                    }
+                },
+                itemStyle: {
+                    normal: {
+                        areaColor: '#0083ce',
+                        borderColor: '#0066ba'
+                    },
+                    emphasis: {
+                        borderWidth: 0,
+                        borderColor: '#0066ba',
+                        areaColor: "#0494e1",
+                        shadowColor: 'rgba(0, 0, 0, 0.5)'
+                    }
+                }
+            },
+            series: series
+        };
+        // 使用制定的配置项和数据显示图表
+        myChart.setOption(mapBoxOption);
+        // echart图表自适应
+        window.addEventListener("resize", function() {
+            myChart.resize();
+        });
+
+    }
+}
+
+</script>
+
+ </div>
+</body>
+</html>

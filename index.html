@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>中国疫情数据可视化</title>
+    <style>
+        * {
+             margin: 0;
+            padding: 0;
+       }
+
+        div {
+             border: 1px ;
+        }
+       /*整个容器*/
+         #main {
+             position: relative;
+            height: 1000px;
+         }
+         /*头部*/
+        #head {
+            position: absolute;
+            height: 5%;
+            width: 100%;
+            background: #EEF4FF;
+       }
+
+        #data {
+            position: absolute;
+            height: 47.5%;
+            width:40%;
+            top:5%;
+
+       }
+        #txt {
+            position: absolute;
+            height: 47.5%;
+            width:40%;
+            top:52.5%;
+
+       }
+        #map {
+            position: absolute;
+            height: 95%;
+            width:60%;
+            top:5%;
+            left: 40%;
+       }
+
+        .myway li{
+            margin-bottom:30px;
+        }
+        ul{
+				background-color: #081832;
+				list-style-type: none;
+				overflow: hidden;
+			}
+
+			li{
+				/*display与float两种方式使列表转为横向*/
+				/* display: inline; */
+				float: left;
+
+			}
+
+			li a{
+				display:block ;
+				color: #FFFFFF;
+				text-decoration: none;
+				text-align: center;
+				padding: 20px 40px;
+			}
+    li a:hover{
+				background-color:#000000 ;
+				color: #999999;
+			}
+.active{
+				background-color: #555;
+			}
+
+    </style>
+</head>
+<body>
+<div id="main">
+    <div id="head">
+             <ul >
+			<li ><a href={% url 'index' %}>今日疫情</a></li>
+			<li><a href={% url 'history' %}>历史疫情</a></li>
+			<li><a href={% url 'move' %}>湖北迁徙</a></li>
+			<li><a href={% url 'wordcloud' %}>百度词云</a></li>
+			<li><a href={% url 'line' %}>疫情趋势</a></li>
+            <li><a href={% url 'ranking' %}>疫情TOP5</a></li>
+            <li><a href={% url 'world' %}>世界疫情</a></li>
+		</ul>
+         </div>
+    <div id="data"></div>
+    <div id="txt"></div>
+    <div id="map"></div>
+    </div>
+<script type="text/javascript" src="/static/echarts-5.1.2/test/lib/jquery.min.js"></script>
+<script type="text/javascript" src="/static/echarts.min.js"></script>
+<script type="text/javascript" src="/static/echarts.js"></script>
+<script type="text/javascript" src="/static/echarts-5.1.2/test/data/map/js/china.js"></script>
+<!-- <script src="./node_modules/_echarts@4.6.0@echarts/map/js/province/guangdong.js"></script> -->
+<script type="text/javascript" src="/static/echarts-5.1.2/test/data/map/js/province/"></script>
+<script type="text/javascript" src="/static/echarts-5.1.2/theme/dark.js"></script>
+<script type="text/javascript" src="/static/echarts-wordcloud.min.js"></script>
+
+<script type="text/javascript">
+    //页面完全载入后(包括图片、css文件等等)执行脚本代码
+    //因为 JavaScript 中的函数方法需要在 HTML 文档渲染完成后才可以使用，如果没有渲染完成，此时的 DOM 树是不完整的，这样在调用一些 JavaScript 代码时就可能报出"undefined"错误。
+window.onload = function () {
+        map();
+        data();
+        txt();
+     function txt(){
+
+  var myChart = echarts.init(document.getElementById('txt'), 'dark');
+    var option = {
+    title: {
+        text: '累计确诊  新增确诊  累计治愈  累计死亡',
+        textAlign: 'center',
+                left: '47%',
+                top: '5',
+                textStyle: {
+                    fontSize: 30,
+
+                }
+    },
+
+            };
+            // 使用刚指定的配置项和数据显示图表。
+            myChart.setOption(option);
+        }
+        function data(){
+
+  var myChart = echarts.init(document.getElementById('data'), 'dark');
+  var today_data = {{ today_data|safe }}
+    var option = {
+    title: {
+        text: today_data,
+        textAlign: 'center',
+                left: '45%',
+                top: '55%',
+                textStyle: {
+                    fontSize: 32,
+                    color: '#FF9B52',
+                }
+    },
+            };
+            // 使用刚指定的配置项和数据显示图表。
+            myChart.setOption(option);
+        }
+
+        function map(){
+  var myChart = echarts.init(document.getElementById('map'), 'dark');
+  var result1={{ result1|safe }}
+  var result3={{ result3|safe }}
+
+
+var option = {
+
+    tooltip:{
+        show:true,
+        formatter:function(params){
+            if(params.data){
+                return params.name+'<br/>累计确诊：'+params.data.value[3]+'<br/>新增确诊：'+params.data.value[1]+
+                    '<br/>治愈：'+params.data.value[2]+'<br/>死亡：'+params.data.value[0]
+            }
+        }
+    },
+    visualMap: {
+        show: true,
+        splitNumber: 4,
+        type:'piecewise',
+        orient: 'vertical', //控制条横向
+        bottom:90,
+        textStyle: {
+              color: '#999'
+            },
+        pieces: [{
+                min: 0,
+                max: 500,
+                color: '#FFD068',
+                label: '0-500人'
+              },
+              {
+                min: 500,
+                max: 1000,
+                color: '#FF9B52',
+                label: '500-1000人'
+              },
+              {
+                min: 1000,
+                max: 2000,
+                color: '#E54D09',
+                label: '1000-2000人'
+              },
+            {
+                min: 2000,
+                max: 4000,
+                color: '#B22222',
+                label: '2000-4000人'
+              },
+            {
+                min: 4000,
+                max: 100000,
+                color: '#800000',
+                label: '>4000人'
+              }
+            ]
+
+
+          //
+        // calculable: true, //是否显示拖把
+    },
+    series:[
+        {
+            type:'map',
+            mapType:'china',
+            // roam:true,
+            label: {
+                show: true
+            },
+            // 区域颜色
+            itemStyle:{
+                areaColor:'#F0FFFF'
+            },
+            //鼠标聚焦时的区域颜色
+            emphasis:{
+                itemStyle:{
+                    areaColor:'#ADD8E6'
+                }
+            },
+            //虚拟数据
+            data:result1,
+
+
+
+        }
+    ],
+};
+console.log(result1)
+myChart.setOption(option);
+
+//定义全国省份的数组
+var cityArr=[
+    ['上海', '河北', '山西', '内蒙古', '辽宁', '吉林','黑龙江',  '江苏', '浙江', '安徽', '福建', '江西', '山东','河南', '湖北', '湖南', '广东', '广西', '海南', '四川', '贵州', '云南', '西藏', '陕西', '甘肃', '青海', '宁夏', '新疆', '北京', '天津', '重庆', '香港', '澳门', '台湾'],
+    ['shanghai', 'hebei','shanxi','neimenggu','liaoning','jilin','heilongjiang','jiangsu','zhejiang','anhui','fujian','jiangxi','shandong','henan','hubei','hunan','guangdong','guangxi','hainan','sichuan','guizhou','yunnan','xizang','shanxi1','gansu','qinghai','ningxia','xinjiang', 'beijing', 'tianjin', 'chongqing', 'xianggang', 'aomen', 'taiwan']
+];
+
+myChart.on('click', function (param) {
+    // 城市中文名
+    var cityName = param.name;
+    // 查找是否有对应城市有则加载城市
+    for(var i=0,len=cityArr[0].length;i<len;i++){
+        if(cityName==cityArr[0][i]){
+            // 获取得城市拼音
+            showCity(cityArr[0][i], cityArr[1][i]);
+            return;
+        }
+    }
+    //没有找到对应城市的话，那么返回到全国地图
+    option.series[0].mapType='china';
+
+    myChart.setOption(option); //为echart对象加载数据
+});
+
+
+// 定义省份
+
+function showCity(zhName, pyName){
+    console.log(zhName, pyName);
+    $.getScript('/static/echarts-5.1.2/test/data/map/js/province/'+pyName+'.js', function(){
+        // 设定中文省份名才能显示相关省份，之后想要设置什么数据，直接设置到option这里就可以了
+        option.series[0].mapType=zhName;
+
+        // 深拷贝，另建option以免丢失原始option数据
+        var cityOption = JSON.parse(JSON.stringify(option));
+        // 模拟虚拟数据
+        if(zhName=='上海'){
+            cityOption.series[0].data=result3[0]
+        }else if(zhName=='河北'){
+            cityOption.series[0].data=result3[1]
+        }else if(zhName=='山西'){
+            cityOption.series[0].data=result3[2]
+        }else if(zhName=='内蒙古'){
+            cityOption.series[0].data=result3[3]
+        }else if(zhName=='辽宁'){
+            cityOption.series[0].data=result3[4]
+        }else if(zhName=='吉林'){
+            cityOption.series[0].data=result3[5]
+        }else if(zhName=='黑龙江'){
+            cityOption.series[0].data=result3[6]
+        }else if(zhName=='江苏'){
+            cityOption.series[0].data=result3[7]
+        }else if(zhName=='浙江'){
+            cityOption.series[0].data=result3[8]
+        }else if(zhName=='安徽'){
+            cityOption.series[0].data=result3[9]
+        }else if(zhName=='福建'){
+            cityOption.series[0].data=result3[10]
+        }else if(zhName=='江西'){
+            cityOption.series[0].data=result3[11]
+        }else if(zhName=='山东'){
+            cityOption.series[0].data=result3[12]
+        }else if(zhName=='河南'){
+            cityOption.series[0].data=result3[13]
+        }else if(zhName=='湖北'){
+            cityOption.series[0].data=result3[14]
+        }else if(zhName=='湖南'){
+            cityOption.series[0].data=result3[15]
+        }else if(zhName=='广东'){
+            cityOption.series[0].data=result3[16]
+        }else if(zhName=='广西'){
+            cityOption.series[0].data=result3[17]
+        }else if(zhName=='海南'){
+            cityOption.series[0].data=result3[18]
+        }else if(zhName=='四川'){
+            cityOption.series[0].data=result3[19]
+        }else if(zhName=='贵州'){
+            cityOption.series[0].data=result3[20]
+        }else if(zhName=='云南'){
+            cityOption.series[0].data=result3[21]
+        }else if(zhName=='西藏'){
+            cityOption.series[0].data=result3[22]
+        }else if(zhName=='陕西'){
+            cityOption.series[0].data=result3[23]
+        }else if(zhName=='甘肃'){
+            cityOption.series[0].data=result3[24]
+        }else if(zhName=='青海'){
+            cityOption.series[0].data=result3[25]
+        }else if(zhName=='宁夏'){
+            cityOption.series[0].data=result3[26]
+        }else if(zhName=='新疆'){
+            cityOption.series[0].data=result3[27]
+        }else if(zhName=='北京'){
+            cityOption.series[0].data=result3[28]
+        }else if(zhName=='天津'){
+            cityOption.series[0].data=result3[29]
+        }else if(zhName=='重庆'){
+            cityOption.series[0].data=result3[30]
+        }else if(zhName=='香港'){
+            cityOption.series[0].data=result3[31]
+        }else if(zhName=='澳门'){
+            cityOption.series[0].data=result3[32]
+        }else if(zhName=='台湾'){
+            cityOption.series[0].data=result3[33]
+        }
+
+        myChart.setOption(cityOption);
+    });
+}
+
+// 地图跟随浏览器缩放 在窗口大小改变之后,就会触发resize事件.
+window.onresize=function(){
+    myChart.resize();
+}}}
+</script>
+</body>
+</html>
