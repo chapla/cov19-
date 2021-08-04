@@ -21,4 +21,4 @@
    
 
    数据库：mysql 5.7
-	
+   使用Navicat for MySQL将爬取到的csv文件的导入MySQL	
